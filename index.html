@@ -87,7 +87,9 @@
 
         const expandList = new Expand({
             view: view,
-            content: layerList
+            content: layerList,
+            group: "top-right",
+            // expanded: true
           });  
 
         // buat dan tambahkan Legenda (letakkan di kanan atas)
@@ -97,7 +99,8 @@
 
         const expandLegend = new Expand({
             view: view,
-            content: legend
+            content: legend,
+            group: "top-right",
           });
 
           // buat dan tambahkan Pemilihan basemap (letakan di kanan atas)
@@ -113,8 +116,8 @@
           // buat dan tambahkan attachment
 
           // ui seluruhnya
-          view.ui.add(expandLegend, "top-right");
-          view.ui.add(expandList, "top-right");
+          view.ui.add([expandLegend, expandList], "top-right");
+          // view.ui.add(expandList, "top-right");
         });
     </script>
   </body>
