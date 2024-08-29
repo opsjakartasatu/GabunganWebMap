@@ -50,7 +50,9 @@
         "esri/views/MapView",
         "esri/layers/FeatureLayer",
         "esri/widgets/FeatureTable",
-      ], function (Map, MapView, FeatureLayer, FeatureTable) {
+        "esri/widgets/Legend", 
+        "esri/widgets/LayerList",
+      ], function (Map, MapView, FeatureLayer, FeatureTable, Legend, LayerList) {
         // buat peta beserta basemap tampilan
         const map = new Map({
           basemap: "streets-vector",
@@ -75,8 +77,17 @@
           view: view,
           layer: layer_kelurahan,
           container: "attributeTable",
+          })
 
-          // buat dan tambahkan Layer List (letakan di kanan atas)
+        // buat dan tambahkan Layer List (letakan di kanan atas)
+        const layerList = new LayerList({
+            view: view,
+          })
+
+        // buat dan tambahkan Legenda (letakkan di kanan atas)
+        const legend = new Legend({
+            view: view,
+          });
 
           // buat dan tambahkan Pemilihan basemap (letakan di kanan atas)
 
@@ -88,9 +99,12 @@
 
           // buat dan tambahkan popup
 
-          //buat dan tambahkan attachment
+          // buat dan tambahkan attachment
+
+          // ui seluruhnya
+          view.ui.add(legend, "top-right");
+          view.ui.add(layerList, "top-right");
         });
-      });
     </script>
   </body>
 </html>
