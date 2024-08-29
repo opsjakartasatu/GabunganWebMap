@@ -3,12 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ArcGIS Map with Filter and Attribute Table</title>
+
+    <!-- Judul website -->
+    <title>ArcGIS Map Gabungan</title>
+
+    <!-- install CDN CSS dan JavaScript-->
     <link
       rel="stylesheet"
       href="https://js.arcgis.com/4.30/esri/themes/light/main.css"
     />
     <script src="https://js.arcgis.com/4.30/"></script>
+
+    <!-- coustum CSS di sini -->
     <style>
       html,
       body,
@@ -30,10 +36,15 @@
       }
     </style>
   </head>
+
   <body>
+    <!-- coustum layout element di sini -->
     <div id="viewDiv"></div>
     <div id="attributeTable"></div>
+
+    <!-- coustum javascript di sini -->
     <script>
+      //Instal modul yang diperlukan saja, jangan lupa di load di function
       require([
         "esri/Map",
         "esri/views/MapView",
@@ -44,23 +55,40 @@
         const map = new Map({
           basemap: "streets-vector",
         });
+
         // buat tampilan peta
         const view = new MapView({
           container: "viewDiv",
           map: map,
           center: [106.827, -6.175], // Longitude, latitude untuk monas Jakarta
-          zoom: 10,
+          zoom: 10, //rentang zoom dari (1-23)
         });
+
         // tambahkan Feature Layer
-        const featureLayer = new FeatureLayer({
-          url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Data_Feature_Layer/FeatureServer/2",
+        const layer_kelurahan = new FeatureLayer({
+          url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Data_Feature_Layer/FeatureServer/2", //layer Kelurahan
         });
-        map.add(featureLayer);
+        map.add(layer_kelurahan);
+
         // buat dan tambahkan Attribute Table widget
         const featureTable = new FeatureTable({
           view: view,
-          layer: featureLayer,
+          layer: layer_kelurahan,
           container: "attributeTable",
+
+          // buat dan tambahkan Layer List
+
+          // buat dan tambahkan Pemilihan basemap (letakan di kanan atas)
+
+          // buat dan tambahkan filter (letakan di kanan atas)
+
+          // buat dan tambahkan editor (letakan di kanan atas)
+
+          // buat dan tambahkan search, arah utara, fullscreen (letakan di kiri atas)
+
+          // buat dan tambahkan popup
+
+          //buat dan tambahkan attachment
         });
       });
     </script>
