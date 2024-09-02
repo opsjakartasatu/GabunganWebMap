@@ -53,7 +53,8 @@
         "esri/widgets/Legend", 
         "esri/widgets/LayerList",
         "esri/widgets/Expand",
-      ], function (Map, MapView, FeatureLayer, FeatureTable, Legend, LayerList, Expand) {
+        "esri/widgets/BasemapGallery",
+      ], function (Map, MapView, FeatureLayer, FeatureTable, Legend, LayerList, Expand, BasemapGallery) {
         // buat peta beserta basemap tampilan
         const map = new Map({
           basemap: "streets-vector",
@@ -104,7 +105,15 @@
           });
 
           // buat dan tambahkan Pemilihan basemap (letakan di kanan atas)
+        const basemapGallery = new BasemapGallery({
+            view: view
+          });
 
+        const expandBasemap = new Expand({
+            view: view,
+            content: basemapGallery,
+            group: "top-right",
+          });
           // buat dan tambahkan filter (letakan di kanan atas)
 
           // buat dan tambahkan editor (letakan di kanan atas)
@@ -116,7 +125,7 @@
           // buat dan tambahkan attachment
 
           // ui seluruhnya
-          view.ui.add([expandLegend, expandList], "top-right");
+          view.ui.add([expandLegend, expandList, expandBasemap], "top-right");
           // view.ui.add(expandList, "top-right");
         });
     </script>
