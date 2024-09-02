@@ -1,203 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Judul website -->
-    <title>ArcGIS Map Gabungan</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- install CDN CSS dan JavaScript-->
-    <link
-      rel="stylesheet"
-      href="https://js.arcgis.com/4.30/esri/themes/light/main.css"
-    />
-    <script src="https://js.arcgis.com/4.30/"></script>
+  <!-- Judul website -->
+  <title>ArcGIS Map Gabungan</title>
 
-    <!-- coustum CSS di sini -->
-    <style>
-      html,
-      body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-      }
+  <!-- install CDN CSS dan JavaScript-->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.30/"></script>
 
-      #appContainer {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        width: 100%;
-      }
+  <!-- coustum CSS di sini -->
+  <style>
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
 
-      #viewDiv {
-        flex: 1;
-        width: 100%;
-      }
+    #appContainer {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+    }
 
-      .container {
-        display: flex;
-        flex: 1;
-        width: 100%;
-      }
+    #123 #viewDiv {
+      flex: 1;
+      width: 100%;
+    }
 
-      #mainDiv {
-        padding: 8px;
-      }
+    .container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+    }
 
-      #tableDiv {
-        height: 100%;
-        width: 100%;
-      }
-    </style>
-  </head>
+    #mainDiv {
+      padding: 8px;
+    }
 
-  <body>
-    <!-- coustum layout element di sini -->
-    <div id="appContainer">
-      <div id="viewDiv"></div>
-      <div id="tableContainer" class="container">
-        <div id="tableDiv"></div>
-      </div>
+    #tableDiv {
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- coustum layout element di sini -->
+  <div id="appContainer">
+    <div id="viewDiv"></div>
+    <div id="tableContainer" class="container">
+      <div id="tableDiv"></div>
     </div>
+  </div>
 
-    <!-- coustum javascript di sini -->
-    <script>
-      //Instal modul yang diperlukan saja, jangan lupa di load di function
-      require([
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/layers/FeatureLayer",
-        "esri/widgets/FeatureTable",
-        "esri/widgets/Legend", 
-        "esri/widgets/LayerList",
-        "esri/widgets/Expand",
-        "esri/widgets/BasemapGallery",
-        "esri/widgets/Editor",
-        "esri/widgets/Search",
-        "esri/widgets/Compass",
-        "esri/widgets/Fullscreen",
-      ], function (Map, MapView, FeatureLayer, FeatureTable, Legend, LayerList, Expand, BasemapGallery, Editor, Search, Compass, Fullscreen) {
-        const appContainer = document.getElementById("appContainer");
-        const tableContainer = document.getElementById("tableContainer");
-        const tableDiv = document.getElementById("tableDiv");
-        
-        // buat peta beserta basemap tampilan
-        const map = new Map({
-          basemap: "streets-vector",
-        });
+  <!-- coustum javascript di sini -->
+  <script>
+    //Instal modul yang diperlukan saja, jangan lupa di load di function
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/widgets/FeatureTable",
+      "esri/widgets/Legend",
+      "esri/widgets/LayerList",
+      "esri/widgets/Expand",
+      "esri/widgets/BasemapGallery",
+      "esri/widgets/Editor",
+      "esri/widgets/Search",
+      "esri/widgets/Compass",
+      "esri/widgets/Fullscreen",
+    ], function (Map, MapView, FeatureLayer, FeatureTable, Legend, LayerList, Expand, BasemapGallery, Editor, Search, Compass, Fullscreen) {
+      const appContainer = document.getElementById("appContainer");
+      const tableContainer = document.getElementById("tableContainer");
+      const tableDiv = document.getElementById("tableDiv");
 
-        // buat tampilan peta
-        const view = new MapView({
-          container: "viewDiv",
-          map: map,
-          center: [106.827, -6.175], // Longitude, latitude untuk monas Jakarta
-          zoom: 10, //rentang zoom dari (1-23)
-        });
+      // buat peta beserta basemap tampilan
+      const map = new Map({
+        basemap: "streets-vector",
+      });
 
-        // tambahkan Feature Layer
-        const layer_kelurahan = new FeatureLayer({
-          url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Data_Feature_Layer/FeatureServer/2", //layer Kelurahan
-        });
-        map.add(layer_kelurahan);
+      // buat tampilan peta
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [106.827, -6.175], // Longitude, latitude untuk monas Jakarta
+        zoom: 10, //rentang zoom dari (1-23)
+      });
 
-        // buat dan tambahkan Attribute Table widget
-        const featureTable = new FeatureTable({
-          view: view,
-          layer: layer_kelurahan,
-          container: tableDiv,
-          })
-        
-        // Tambahkan tombol untuk toggle feature table
-        const toggleButton = document.createElement("button");
-          toggleButton.innerHTML = '<span class="esri-icon-table"></span>';
-          toggleButton.className = "esri-widget--button esri-widget esri-interactive";
-          toggleButton.onclick = () => {
-            if (appContainer.contains(tableContainer)) {
-              appContainer.removeChild(tableContainer);
-            } else {
-              appContainer.appendChild(tableContainer);
-            }
-          };
+      // tambahkan Feature Layer
+      const layer_kelurahan = new FeatureLayer({
+        url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Data_Feature_Layer/FeatureServer/2", //layer Kelurahan
+      });
+      map.add(layer_kelurahan);
 
-        view.ui.add(toggleButton, "bottom-right");
+      // buat dan tambahkan Attribute Table widget
+      const featureTable = new FeatureTable({
+        view: view,
+        layer: layer_kelurahan,
+        container: tableDiv,
+      })
 
-        // buat dan tambahkan Layer List (letakan di kanan atas)
-        const layerList = new LayerList({
-            view: view,
-          })
+      // Tambahkan tombol untuk toggle feature table
+      const toggleButton = document.createElement("button");
+      toggleButton.innerHTML = '<span class="esri-icon-table"></span>';
+      toggleButton.className = "esri-widget--button esri-widget esri-interactive";
+      toggleButton.onclick = () => {
+        if (appContainer.contains(tableContainer)) {
+          appContainer.removeChild(tableContainer);
+        } else {
+          appContainer.appendChild(tableContainer);
+        }
+      };
 
-        const expandList = new Expand({
-            view: view,
-            content: layerList,
-            group: "top-right",
-            // expanded: true
-          });  
+      view.ui.add(toggleButton, "bottom-right");
 
-        // buat dan tambahkan Legenda (letakkan di kanan atas)
-        const legend = new Legend({
-            view: view,
-          });
+      // buat dan tambahkan Layer List (letakan di kanan atas)
+      const layerList = new LayerList({
+        view: view,
+      })
 
-        const expandLegend = new Expand({
-            view: view,
-            content: legend,
-            group: "top-right",
-          });
+      const expandList = new Expand({
+        view: view,
+        content: layerList,
+        group: "top-right",
+        // expanded: true
+      });
 
-          // buat dan tambahkan Pemilihan basemap (letakan di kanan atas)
-        const basemapGallery = new BasemapGallery({
-            view: view
-          });
+      // buat dan tambahkan Legenda (letakkan di kanan atas)
+      const legend = new Legend({
+        view: view,
+      });
 
-        const expandBasemap = new Expand({
-            view: view,
-            content: basemapGallery,
-            group: "top-right",
-          });
-          // buat dan tambahkan filter (letakan di kanan atas)
+      const expandLegend = new Expand({
+        view: view,
+        content: legend,
+        group: "top-right",
+      });
 
-          // buat dan tambahkan editor (letakan di kanan atas)
-          const editor = new Editor({
-            view: view,
-          });
+      // buat dan tambahkan Pemilihan basemap (letakan di kanan atas)
+      const basemapGallery = new BasemapGallery({
+        view: view
+      });
 
-          const expandEditor = new Expand({
-            view: view,
-            content: editor,
-            group: "top-right",
-          });
+      const expandBasemap = new Expand({
+        view: view,
+        content: basemapGallery,
+        group: "top-right",
+      });
+      // buat dan tambahkan filter (letakan di kanan atas)
 
-          // buat dan tambahkan search, arah utara, fullscreen (letakan di kiri atas)
-          const searchWidget = new Search({
-            view: view,
-            group: "top-left",
-          });
+      // buat dan tambahkan editor (letakan di kanan atas)
+      const editor = new Editor({
+        view: view,
+      });
 
-          const expandSearch = new Expand({
-            view: view,
-            content: searchWidget,
-            group: "top-left",
-          });
+      const expandEditor = new Expand({
+        view: view,
+        content: editor,
+        group: "top-right",
+      });
 
-          const compassWidget = new Compass({
-            view: view,
-            group: "top-left",
-          });
+      // buat dan tambahkan search, arah utara, fullscreen (letakan di kiri atas)
+      const searchWidget = new Search({
+        view: view,
+        group: "top-left",
+      });
 
-          const fullscreen = new Fullscreen({
-            view: view,
-            group: "top-left",
-          })
-          // buat dan tambahkan popup
+      const expandSearch = new Expand({
+        view: view,
+        content: searchWidget,
+        group: "top-left",
+      });
 
-          // buat dan tambahkan attachment
+      const compassWidget = new Compass({
+        view: view,
+        group: "top-left",
+      });
 
-          // ui seluruhnya
-          view.ui.add([expandList, expandBasemap, expandLegend, expandEditor], "top-right");
-          view.ui.add([compassWidget, expandSearch, fullscreen], "top-left");
-        });
-    </script>
-  </body>
+      const fullscreen = new Fullscreen({
+        view: view,
+        group: "top-left",
+      })
+      // buat dan tambahkan popup
+
+      // buat dan tambahkan attachment
+
+      // ui seluruhnya
+      view.ui.add([expandList, expandBasemap, expandLegend, expandEditor], "top-right");
+      view.ui.add([compassWidget, expandSearch, fullscreen], "top-left");
+    });
+  </script>
+</body>
+
 </html>
