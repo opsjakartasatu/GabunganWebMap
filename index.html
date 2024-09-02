@@ -55,7 +55,10 @@
         "esri/widgets/Expand",
         "esri/widgets/BasemapGallery",
         "esri/widgets/Editor",
-      ], function (Map, MapView, FeatureLayer, FeatureTable, Legend, LayerList, Expand, BasemapGallery, Editor) {
+        "esri/widgets/Search",
+        "esri/widgets/Compass",
+        "esri/widgets/Fullscreen",
+      ], function (Map, MapView, FeatureLayer, FeatureTable, Legend, LayerList, Expand, BasemapGallery, Editor, Search, Compass, Fullscreen) {
         // buat peta beserta basemap tampilan
         const map = new Map({
           basemap: "streets-vector",
@@ -129,14 +132,33 @@
           });
 
           // buat dan tambahkan search, arah utara, fullscreen (letakan di kiri atas)
+          const searchWidget = new Search({
+            view: view,
+            group: "top-left",
+          });
 
+          const expandSearch = new Expand({
+            view: view,
+            content: searchWidget,
+            group: "top-left",
+          });
+
+          const compassWidget = new Compass({
+            view: view,
+            group: "top-left",
+          });
+
+          const fullscreen = new Fullscreen({
+            view: view,
+            group: "top-left",
+          })
           // buat dan tambahkan popup
 
           // buat dan tambahkan attachment
 
           // ui seluruhnya
           view.ui.add([expandList, expandBasemap, expandLegend, expandEditor], "top-right");
-          // view.ui.add(expandList, "top-right");
+          view.ui.add([compassWidget, expandSearch, fullscreen], "top-left");
         });
     </script>
   </body>
