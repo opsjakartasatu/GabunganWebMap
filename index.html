@@ -118,10 +118,10 @@
         toggleButton.innerHTML = '<span class="esri-icon-table"></span>';
         toggleButton.className = "esri-widget--button esri-widget esri-interactive";
         toggleButton.onclick = () => {
-          if (tableContainer.style.display === "none") {
-            tableContainer.style.display = "flex";
-          } else {
+          if (tableContainer.style.display === "flex") {
             tableContainer.style.display = "none";
+          } else {
+            tableContainer.style.display = "flex";
           }
         };
 
