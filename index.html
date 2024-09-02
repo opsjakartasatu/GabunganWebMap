@@ -50,6 +50,10 @@
         height: 100%;
         width: 100%;
       }
+
+      #tableContainer {
+        display: none; /* Hide the table container by default */
+      }
     </style>
   </head>
 
@@ -111,15 +115,15 @@
         
         // Tambahkan tombol untuk toggle feature table
         const toggleButton = document.createElement("button");
-          toggleButton.innerHTML = '<span class="esri-icon-table"></span>';
-          toggleButton.className = "esri-widget--button esri-widget esri-interactive";
-          toggleButton.onclick = () => {
-            if (appContainer.contains(tableContainer)) {
-              appContainer.removeChild(tableContainer);
-            } else {
-              appContainer.appendChild(tableContainer);
-            }
-          };
+        toggleButton.innerHTML = '<span class="esri-icon-table"></span>';
+        toggleButton.className = "esri-widget--button esri-widget esri-interactive";
+        toggleButton.onclick = () => {
+          if (tableContainer.style.display === "none") {
+            tableContainer.style.display = "flex";
+          } else {
+            tableContainer.style.display = "none";
+          }
+        };
 
         view.ui.add(toggleButton, "bottom-right");
 
