@@ -215,7 +215,10 @@
             view: view,
             group: "top-left",
             element: appContainer,
-          })
+          });
+
+          // buat dan tambahkan widget locate dan home (sebelah kiri atas/bawah)
+          
           // buat dan tambahkan popup
             function getPopupContent(feature) {
                 const attributes = feature.graphic.attributes;
@@ -248,7 +251,7 @@
           
           // ui seluruhnya
           view.ui.add([expandList, expandBasemap, expandLegend, expandEditor], "top-right");
-          view.ui.add([compassWidget, expandSearch, fullscreen], "top-left");
+          view.ui.add([compassWidget, fullscreen, expandSearch], "top-left");
         });
     </script>
   </body>
