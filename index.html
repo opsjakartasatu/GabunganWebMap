@@ -169,6 +169,23 @@
           // buat dan tambahkan editor (letakan di kanan atas)
           const editor = new Editor({
             view: view,
+            layerInfos: [{
+                    layer: layer_kelurahan,
+                    formTemplate: {
+                        elements: [
+                            {
+                                type: "field",
+                                fieldName: "wadmkd",
+                                label: "KELURAHAN"
+                            },
+                            {
+                                type: "field",
+                                fieldName: "wadmkc",
+                                label: "KECAMATAN"
+                            }
+                        ]
+                    }
+                }]
           });
 
           const expandEditor = new Expand({
