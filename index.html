@@ -82,7 +82,9 @@
         "esri/widgets/Search",
         "esri/widgets/Compass",
         "esri/widgets/Fullscreen",
-      ], function (Map, MapView, FeatureLayer, FeatureTable, Legend, LayerList, Expand, BasemapGallery, Editor, Search, Compass, Fullscreen) {
+        "esri/widgets/Locate",
+        "esri/widgets/Home",
+      ], function (Map, MapView, FeatureLayer, FeatureTable, Legend, LayerList, Expand, BasemapGallery, Editor, Search, Compass, Fullscreen, Locate, Home) {
         const appContainer = document.getElementById("appContainer");
         const tableContainer = document.getElementById("tableContainer");
         const tableDiv = document.getElementById("tableDiv");
@@ -203,7 +205,7 @@
           const expandSearch = new Expand({
             view: view,
             content: searchWidget,
-            group: "top-left",
+            group: "top-right",
           });
 
           const compassWidget = new Compass({
@@ -218,6 +220,15 @@
           });
 
           // buat dan tambahkan widget locate dan home (sebelah kiri atas/bawah)
+          const locate = new Locate({
+            view: view,
+            group: "top-left",
+          });
+          
+          const home = new Home({
+            view: view,
+            group: "top-left",
+          });
           
           // buat dan tambahkan popup
             function getPopupContent(feature) {
@@ -250,8 +261,8 @@
             }
           
           // ui seluruhnya
-          view.ui.add([expandList, expandBasemap, expandLegend, expandEditor], "top-right");
-          view.ui.add([compassWidget, fullscreen, expandSearch], "top-left");
+          view.ui.add([expandSearch, expandList, expandBasemap, expandLegend, expandEditor], "top-right");
+          view.ui.add([compassWidget, home, locate, fullscreen], "top-left");
         });
     </script>
   </body>
