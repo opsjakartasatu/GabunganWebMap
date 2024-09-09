@@ -180,24 +180,26 @@
           container: "viewDiv",
           map: map,
           center: [106.827, -6.175], // Longitude, latitude untuk monas Jakarta
-          zoom: 10, //rentang zoom dari (1-23)
+          zoom: 14, //rentang zoom dari (1-23)
         });
 
         // tambahkan Feature Layer
-        const layer_kelurahan = new FeatureLayer({
+        const layer_satu = new FeatureLayer({
           url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Batas_Admin_RT_PetaKerja/FeatureServer",
           // url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Kependudukan_Jakpus/FeatureServer",
+          title: "Batas RT",
+          outFields: ["*"],
           popupTemplate: {
             title: "POP UP",
             content: getPopupContent,
           }, //layer Kelurahan
         });
-        map.add(layer_kelurahan);
+        map.add(layer_satu);
 
         // buat dan tambahkan Attribute Table widget
         const featureTable = new FeatureTable({
           view: view,
-          layer: layer_kelurahan,
+          layer: layer_satu,
           container: tableDiv,
         });
 
@@ -262,8 +264,8 @@
         };
 
         // Populate filter fields
-        layer_kelurahan.when(() => {
-          const fields = layer_kelurahan.fields;
+        layer_satu.when(() => {
+          const fields = layer_satu.fields;
           fields.forEach((field) => {
             const filterOption = document.createElement("option");
             filterOption.value = field.name;
@@ -284,11 +286,11 @@
             if (!selectedField) return;
 
             // Create query to get distinct values for the selected field
-            const query = layer_kelurahan.createQuery();
+            const query = layer_satu.createQuery();
             query.returnDistinctValues = true;
             query.outFields = [selectedField];
             query.orderByFields = [selectedField]; // Ensure order
-            layer_kelurahan.queryFeatures(query).then((result) => {
+            layer_satu.queryFeatures(query).then((result) => {
               result.features.forEach((feature) => {
                 const value = feature.attributes[selectedField];
                 if (value !== null && value !== undefined) {
@@ -308,7 +310,7 @@
 
         function updateFeatureTable() {
           // Memperbarui tabel atribut dengan data yang terfilter
-          featureTable.layer = layer_kelurahan; // Reassign the layer to refresh the table
+          featureTable.layer = layer_satu; // Reassign the layer to refresh the table
           featureTable.refresh();
         }
 
@@ -318,14 +320,14 @@
           const value = document.getElementById("filterValue").value;
           const query = `${field} = '${value}'`;
 
-          layer_kelurahan.definitionExpression = query;
+          layer_satu.definitionExpression = query;
           updateFeatureTable();
           document.getElementById("filterContainer").classList.remove("active");
         });
 
         // Reset filter
         document.getElementById("resetFilter").addEventListener("click", () => {
-          layer_kelurahan.definitionExpression = null;
+          layer_satu.definitionExpression = null;
           updateFeatureTable();
           document.getElementById("filterContainer").classList.remove("active");
         });
@@ -352,7 +354,7 @@
           view: view,
           layerInfos: [
             {
-              layer: layer_kelurahan,
+              layer: layer_satu,
               formTemplate: {
                 elements: [
                   {
@@ -417,6 +419,7 @@
         function getPopupContent(feature) {
           const attributes = feature.graphic.attributes;
           let content = "<table class='popup-table'>";
+          console.log(attributes);
 
           content += "<b>Attributes:</b>";
           content += "<table>";
