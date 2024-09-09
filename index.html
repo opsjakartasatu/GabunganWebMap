@@ -117,6 +117,15 @@
       </div>
     </div>
 
+    <!-- Script untuk nama SKPD -->
+    <script type="text/plain" id="skpd">
+      if (IsEmpty(geometry($feature))) {
+        return null;
+      } else {
+        return 'DCKTRP';
+      }
+    </script>
+
     <!-- coustum javascript di sini -->
     <script>
       //Instal modul yang diperlukan saja, jangan lupa di load di function
@@ -135,6 +144,9 @@
         "esri/widgets/Fullscreen",
         "esri/widgets/Locate",
         "esri/widgets/Home",
+        "esri/form/ExpressionInfo",
+        "esri/form/FormTemplate",
+        "esri/form/elements/FieldElement",
       ], function (
         Map,
         MapView,
@@ -149,7 +161,10 @@
         Compass,
         Fullscreen,
         Locate,
-        Home
+        Home,
+        ExpressionInfo,
+        formTemplate,
+        FieldElement
       ) {
         const appContainer = document.getElementById("appContainer");
         const tableContainer = document.getElementById("tableContainer");
@@ -170,7 +185,8 @@
 
         // tambahkan Feature Layer
         const layer_kelurahan = new FeatureLayer({
-          url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Kependudukan_Jakpus/FeatureServer",
+          url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Batas_Admin_RT_PetaKerja/FeatureServer",
+          // url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Kependudukan_Jakpus/FeatureServer",
           popupTemplate: {
             title: "POP UP",
             content: getPopupContent,
@@ -314,6 +330,23 @@
           document.getElementById("filterContainer").classList.remove("active");
         });
 
+        // Default SKPD
+        const skpdExpression = new ExpressionInfo({
+          expression: document.getElementById("skpd").text,
+          name: "skpd",
+        });
+
+        const skpdFieldElement = new FieldElement({
+          label: "skpd",
+          fieldName: "skpd",
+          editableExpression: "false",
+          input: {
+            type: "text-box",
+            maxLength: 150,
+          },
+          valueExpression: "skpd",
+        });
+
         // buat dan tambahkan editor (letakan di kanan atas)
         const editor = new Editor({
           view: view,
@@ -332,7 +365,9 @@
                     fieldName: "wadmkc",
                     label: "KECAMATAN",
                   },
+                  skpdFieldElement,
                 ],
+                expressionInfos: [skpdExpression],
               },
             },
           ],
