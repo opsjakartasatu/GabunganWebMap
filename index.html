@@ -357,7 +357,29 @@
 
         layer_satu.definitionExpression = query;
         updateFeatureTable();
-        document.getElementById("filterContainer").classList.remove("active");
+
+        // Zoom to filtered features
+        const queryToZoom = layer_satu.createQuery();
+        queryToZoom.where = query;
+        queryToZoom.outFields = ['*']; // Retrieve all fields including geometry
+
+        layer_satu.queryFeatures(queryToZoom).then((result) => {
+          if (result.features.length > 0) {
+            // Use the extent of all features to zoom
+            const extent = result.features.reduce((acc, feature) => {
+              return acc.union(feature.geometry.extent);
+            }, result.features[0].geometry.extent);
+
+            view.goTo(extent).then(() => {
+              console.log("Zoomed to filtered location");
+            }).catch((error) => {
+              console.error("Zoom failed: ", error);
+            });
+          } else {
+            console.log("No features found for the filter.");
+          }
+        });
+
       });
 
       // Reset filter
@@ -366,6 +388,7 @@
         updateFeatureTable();
         document.getElementById("filterContainer").classList.remove("active");
       });
+
 
       // Default SKPD
       const skpdExpression = new ExpressionInfo({
