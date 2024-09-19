@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -52,10 +53,18 @@
       #tableDiv {
         height: 300px;
       }
+      .zoom-button {
+        background-color: #0079c1;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 3px;
+      }
     </style>
 
     <script>
-      require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/FeatureTable"], (Map, MapView, FeatureLayer, FeatureTable) => {
+      require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/FeatureTable", "esri/geometry/Extent", "esri/core/reactiveUtils"], (Map, MapView, FeatureLayer, FeatureTable, Extent, reactiveUtils) => {
         // Basemap
         const map = new Map({
           basemap: "topo-vector",
@@ -64,7 +73,7 @@
         // Map View
         const view = new MapView({
           map: map,
-          center: [106.827464, -6.175371], // Longitude, latitude
+          center: [144.8063384, 13.437549], // Longitude, latitude
           zoom: 13,
           container: "viewDiv",
         });
@@ -73,10 +82,85 @@
           url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/CollegesUniversities/FeatureServer/0",
           title: "US Colleges and Universities",
         });
+        map.add(featureLayer);
 
         // Create the FeatureTable from the provided FeatureLayer
         const featureTable = new FeatureTable({
+          view: view, // Required for feature highlight to work
           layer: featureLayer,
+          visibleElements: {
+            // Autocast to VisibleElements
+            menuItems: {
+              clearSelection: true,
+              refreshData: true,
+              toggleColumns: true,
+              selectedRecordsShowAllToggle: true,
+              selectedRecordsShowSelectedToggle: true,
+              zoomToSelection: true,
+            },
+          },
+          tableTemplate: {
+            // autocastable to TableTemplate
+            // The table template's columnTemplates are used to determine which attributes are shown in the table
+            columnTemplates: [
+              // Array of either FieldColumnTemplates or GroupColumnTemplates
+              {
+                // autocastable to FieldColumnTemplate
+                type: "field",
+                fieldName: "FID",
+                label: "ID",
+                // This field will not be shown in the table
+                visible: false,
+              },
+              {
+                type: "field",
+                fieldName: "NAME",
+                label: "School Name",
+                // The table will be sorted by this column
+                // in ascending order
+                direction: "asc", // This is required for initial sorting
+                initialSortPriority: 1, // This columns get priority after Enrollment
+              },
+              {
+                type: "field",
+                fieldName: "TOT_ENROLL",
+                label: "Enrollment",
+                direction: "asc", // This is required for initial sorting
+                initialSortPriority: 0, // This column gets the highest sort priority
+              },
+              {
+                type: "field",
+                fieldName: "WEBSITE",
+                label: "Website",
+              },
+              {
+                type: "field",
+                fieldName: "ADDRESS",
+                label: "Address",
+                visible: false,
+              },
+              {
+                type: "field",
+                fieldName: "CITY",
+                label: "City",
+              },
+              {
+                type: "field",
+                fieldName: "STATE",
+                label: "State",
+              },
+              {
+                type: "field",
+                fieldName: "ZIP",
+                label: "Zip Code",
+              },
+              {
+                type: "field",
+                fieldName: "TELEPHONE",
+                label: "Phone Number",
+              },
+            ],
+          },
           container: document.getElementById("tableDiv"),
         });
 
@@ -94,6 +178,45 @@
           }
         }
 
+        // Zoom to feature function
+        function zoomToFeature(oid) {
+          featureLayer
+            .queryFeatures({
+              objectIds: [oid],
+            })
+            .then((result) => {
+              if (result.features.length > 0) {
+                const feature = result.features[0];
+                view.goTo({
+                  target: feature.geometry,
+                  zoom: 15,
+                });
+              }
+            });
+        }
+
+        // Create a custom button in the table
+        function createZoomToButton(feature) {
+          const button = document.createElement("button");
+          button.textContent = "Zoom To";
+          button.classList.add("zoom-button");
+          button.addEventListener("click", () => {
+            zoomToFeature(feature.attributes.OBJECTID);
+          });
+          return button;
+        }
+
+        // Custom renderer for the table to include Zoom To button
+        featureTable.on("data-changed", () => {
+          const rows = document.querySelectorAll(".esri-feature-table__row");
+          rows.forEach((row) => {
+            const oid = row.getAttribute("data-objectid");
+            const button = createZoomToButton({ attributes: { OBJECTID: oid } });
+            const cell = row.querySelector(".esri-feature-table__cell:last-child"); // Append to the last cell
+            cell.appendChild(button);
+          });
+        });
+
         // Populate NAME dropdown with unique names
         featureLayer
           .queryFeatures({
@@ -104,6 +227,7 @@
           })
           .then((result) => {
             const nameDropdown = document.getElementById("nameFilter");
+            nameDropdown.innerHTML = "<option disabled selected>Select a School Name</option>";
             result.features.forEach((feature) => {
               const option = document.createElement("option");
               option.value = feature.attributes.NAME;
@@ -162,6 +286,41 @@
         document.getElementById("applyCityFilterBtn").addEventListener("click", applyCityFilter);
         document.getElementById("resetFilterBtn").addEventListener("click", resetFilter);
         document.getElementById("toggleButton").addEventListener("click", toggleAttributeTable);
+
+        // Function to search data by NAME column
+        function searchByName() {
+          const searchText = document.getElementById("searchName").value.trim();
+
+          if (searchText) {
+            // Update definition expression to filter by search text
+            featureLayer.definitionExpression = `NAME LIKE '%${searchText}%'`;
+
+            // Optionally, you may want to refresh the feature table or layer after filtering
+            featureLayer.refresh();
+          } else {
+            // If search text is empty, remove the definition expression
+            featureLayer.definitionExpression = null;
+          }
+        }
+
+        // Event listener for the search button
+        document.getElementById("searchBtn").addEventListener("click", searchByName);
+
+        // Function to clear search and filters
+        function clearFilters() {
+          // Clear the search input
+          document.getElementById("searchName").value = "";
+
+          // Reset the NAME and CITY dropdowns
+          document.getElementById("nameFilter").selectedIndex = 0;
+          document.getElementById("cityFilter").innerHTML = "<option disabled selected>Select a City</option>";
+
+          // Remove definition expression
+          featureLayer.definitionExpression = null;
+        }
+
+        // Event listener for the clear button
+        document.getElementById("clearBtn").addEventListener("click", clearFilters);
       });
     </script>
   </head>
@@ -186,6 +345,11 @@
 
         <button id="resetFilterBtn">Reset Filter</button>
       </div>
+      <label for="searchName">Search by School Name:</label>
+      <input type="text" id="searchName" placeholder="Enter school name" />
+      <button id="searchBtn">Search</button>
+      <button id="clearBtn">Clear</button>
+
       <div id="tableDiv"></div>
     </div>
   </body>
