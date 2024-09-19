@@ -20,22 +20,12 @@
         height: 100%;
         width: 100%;
       }
-      #toggleButton {
-        position: absolute;
-        top: 100px;
-        left: 10px;
-        z-index: 10;
-        background-color: white;
-        padding: 10px;
-        border: 1px solid #ccc;
-        cursor: pointer;
-      }
       #attributeContainer {
         position: absolute;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 400px;
+        height: 380px;
         background-color: white;
         display: none; /* Initially hidden */
         z-index: 10;
@@ -52,14 +42,6 @@
       }
       #tableDiv {
         height: 300px;
-      }
-      .zoom-button {
-        background-color: #0079c1;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-        border-radius: 3px;
       }
     </style>
 
@@ -164,19 +146,28 @@
           container: document.getElementById("tableDiv"),
         });
 
-        // Toggle the attribute table and filters
+        // Tambahkan tombol untuk toggle feature table
         function toggleAttributeTable() {
           const attributeContainer = document.getElementById("attributeContainer");
-          const toggleButton = document.getElementById("toggleButton");
+        }
 
-          if (attributeContainer.style.display === "none") {
+        // Membuat tombol toggle
+        const toggleButton = document.createElement("button");
+        toggleButton.innerHTML = '<span class="esri-icon-table"></span>';
+        toggleButton.className = "esri-widget--button esri-widget esri-interactive";
+        toggleButton.style.position = "absolute";
+
+        // Menambahkan event onclick untuk toggle display
+        toggleButton.onclick = () => {
+          if (attributeContainer.style.display === "none" || attributeContainer.style.display === "") {
             attributeContainer.style.display = "block";
-            toggleButton.textContent = "Hide Attribute Table";
           } else {
             attributeContainer.style.display = "none";
-            toggleButton.textContent = "Show Attribute Table";
           }
-        }
+        };
+
+        // Panggil fungsi untuk menambahkan tombol ke halaman
+        toggleAttributeTable();
 
         // Zoom to feature function
         function zoomToFeature(oid) {
@@ -321,13 +312,14 @@
 
         // Event listener for the clear button
         document.getElementById("clearBtn").addEventListener("click", clearFilters);
+
+        view.ui.add([toggleButton], "top-right");
       });
     </script>
   </head>
   <body>
     <div id="viewDiv"></div>
-
-    <div id="toggleButton">Show Attribute Table</div>
+    <div id="toggleButton"></div>
 
     <div id="attributeContainer">
       <div id="filterContainer">
