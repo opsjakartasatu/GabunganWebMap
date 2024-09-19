@@ -1,0 +1,192 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Map with Toggleable Attribute Table</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.30/"></script>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #viewDiv {
+        height: 100%;
+        width: 100%;
+      }
+      #toggleButton {
+        position: absolute;
+        top: 100px;
+        left: 10px;
+        z-index: 10;
+        background-color: white;
+        padding: 10px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+      }
+      #attributeContainer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 400px;
+        background-color: white;
+        display: none; /* Initially hidden */
+        z-index: 10;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+        overflow-y: auto;
+      }
+      #filterContainer {
+        margin-bottom: 10px;
+        padding: 10px;
+      }
+      #filterContainer button {
+        margin-left: 10px;
+      }
+      #tableDiv {
+        height: 300px;
+      }
+    </style>
+
+    <script>
+      require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/FeatureTable"], (Map, MapView, FeatureLayer, FeatureTable) => {
+        // Basemap
+        const map = new Map({
+          basemap: "topo-vector",
+        });
+
+        // Map View
+        const view = new MapView({
+          map: map,
+          center: [106.827464, -6.175371], // Longitude, latitude
+          zoom: 13,
+          container: "viewDiv",
+        });
+
+        const featureLayer = new FeatureLayer({
+          url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/CollegesUniversities/FeatureServer/0",
+          title: "US Colleges and Universities",
+        });
+
+        // Create the FeatureTable from the provided FeatureLayer
+        const featureTable = new FeatureTable({
+          layer: featureLayer,
+          container: document.getElementById("tableDiv"),
+        });
+
+        // Toggle the attribute table and filters
+        function toggleAttributeTable() {
+          const attributeContainer = document.getElementById("attributeContainer");
+          const toggleButton = document.getElementById("toggleButton");
+
+          if (attributeContainer.style.display === "none") {
+            attributeContainer.style.display = "block";
+            toggleButton.textContent = "Hide Attribute Table";
+          } else {
+            attributeContainer.style.display = "none";
+            toggleButton.textContent = "Show Attribute Table";
+          }
+        }
+
+        // Populate NAME dropdown with unique names
+        featureLayer
+          .queryFeatures({
+            where: "1=1",
+            outFields: ["NAME"],
+            returnDistinctValues: true,
+            orderByFields: ["NAME"],
+          })
+          .then((result) => {
+            const nameDropdown = document.getElementById("nameFilter");
+            result.features.forEach((feature) => {
+              const option = document.createElement("option");
+              option.value = feature.attributes.NAME;
+              option.text = feature.attributes.NAME;
+              nameDropdown.appendChild(option);
+            });
+          });
+
+        // Function to apply the NAME filter and populate CITY dropdown
+        function applyNameFilter() {
+          const selectedName = document.getElementById("nameFilter").value;
+
+          if (selectedName) {
+            featureLayer.definitionExpression = `NAME = '${selectedName}'`;
+
+            featureLayer
+              .queryFeatures({
+                where: `NAME = '${selectedName}'`,
+                outFields: ["CITY"],
+                returnDistinctValues: true,
+                orderByFields: ["CITY"],
+              })
+              .then((result) => {
+                const cityDropdown = document.getElementById("cityFilter");
+                cityDropdown.innerHTML = "<option disabled selected>Select a City</option>";
+
+                result.features.forEach((feature) => {
+                  const option = document.createElement("option");
+                  option.value = feature.attributes.CITY;
+                  option.text = feature.attributes.CITY;
+                  cityDropdown.appendChild(option);
+                });
+              });
+          }
+        }
+
+        // Apply filter based on both NAME and CITY selection
+        function applyCityFilter() {
+          const selectedName = document.getElementById("nameFilter").value;
+          const selectedCity = document.getElementById("cityFilter").value;
+
+          if (selectedName && selectedCity) {
+            featureLayer.definitionExpression = `NAME = '${selectedName}' AND CITY = '${selectedCity}'`;
+          }
+        }
+
+        // Reset filters
+        function resetFilter() {
+          document.getElementById("nameFilter").selectedIndex = 0;
+          document.getElementById("cityFilter").innerHTML = "<option disabled selected>Select a City</option>";
+          featureLayer.definitionExpression = null;
+        }
+
+        // Event listeners for buttons
+        document.getElementById("applyNameFilterBtn").addEventListener("click", applyNameFilter);
+        document.getElementById("applyCityFilterBtn").addEventListener("click", applyCityFilter);
+        document.getElementById("resetFilterBtn").addEventListener("click", resetFilter);
+        document.getElementById("toggleButton").addEventListener("click", toggleAttributeTable);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+
+    <div id="toggleButton">Show Attribute Table</div>
+
+    <div id="attributeContainer">
+      <div id="filterContainer">
+        <label for="nameFilter">Filter by School Name:</label>
+        <select id="nameFilter">
+          <option disabled selected>Select a School Name</option>
+        </select>
+        <button id="applyNameFilterBtn">Apply Name Filter</button>
+
+        <label for="cityFilter">Filter by City:</label>
+        <select id="cityFilter">
+          <option disabled selected>Select a City</option>
+        </select>
+        <button id="applyCityFilterBtn">Apply City Filter</button>
+
+        <button id="resetFilterBtn">Reset Filter</button>
+      </div>
+      <div id="tableDiv"></div>
+    </div>
+  </body>
+</html>
