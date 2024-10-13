@@ -200,7 +200,7 @@
 
         // buat peta beserta basemap tampilan
         const map = new Map({
-          basemap: "streets-vector",
+          basemap: "osm",
         });
 
         // buat tampilan peta
@@ -208,7 +208,7 @@
           container: "viewDiv",
           map: map,
           center: [106.827, -6.175], // Longitude, latitude untuk monas Jakarta
-          zoom: 14, //rentang zoom dari (1-23)
+          zoom: 15, //rentang zoom dari (1-23)
         });
 
         // tambahkan Feature Layer
