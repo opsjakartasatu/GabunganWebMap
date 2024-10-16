@@ -1,150 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Judul website -->
-    <title>ArcGIS Map Gabungan</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- install CDN CSS dan JavaScript-->
-    <link
-      rel="stylesheet"
-      href="https://js.arcgis.com/4.30/esri/themes/light/main.css"
-    />
-    <script src="https://js.arcgis.com/4.30/"></script>
+  <!-- Judul website -->
+  <title>ArcGIS Map Gabungan</title>
 
-    <!-- coustum CSS di sini -->
-    <style>
-      html,
-      body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-      }
+  <!-- install CDN CSS dan JavaScript-->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.30/"></script>
 
-      #appContainer {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        width: 100%;
-      }
+  <!-- coustum CSS di sini -->
+  <style>
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
 
-      #viewDiv {
-        flex: 1;
-        width: 100%;
-      }
+    #appContainer {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+    }
 
-      .container {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        width: 100%;
-      }
+    #viewDiv {
+      flex: 1;
+      width: 100%;
+    }
 
-      #mainDiv {
-        padding: 8px;
-      }
+    .container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      width: 100%;
+    }
 
-      #tableDiv {
-        height: 100%;
-        width: 100%;
-      }
+    #mainDiv {
+      padding: 8px;
+    }
 
-      #tableContainer {
-        display: none;
-      }
+    #tableDiv {
+      height: 100%;
+      width: 100%;
+    }
 
-      #filterContainer {
-        display: none;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 300px;
-        padding: 20px;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        z-index: 2;
-      }
+    #tableContainer {
+      display: none;
+    }
 
-      .closeButton {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        cursor: pointer;
-      }
+    #filterContainer {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      z-index: 2;
+    }
 
-      #filterField,
-      #filterValue {
-        width: 45%;
-      }
+    .closeButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
 
-      #filterField {
-        margin-right: 10px;
-      }
+    #filterField,
+    #filterValue {
+      width: 45%;
+    }
 
-      #row {
-        background-color: white;
-        padding: 5px;
-      }
-      #row button {
-        margin-left: 5px;
-      }
-    </style>
-  </head>
+    #filterField {
+      margin-right: 10px;
+    }
 
-  <body>
-    <!-- coustum layout element di sini -->
-    <div id="appContainer">
-      <div id="viewDiv">
-        <div id="filterContainer">
-          <div class="row">
-            <span class="closeButton">X</span>
-            <h3>Filter Layer</h3>
-            <div class="select-container">
-              <select id="filterField"></select>
-              <select id="filterValue">
-                <option value="">Select value</option>
-              </select>
-            </div>
-            <div class="button-container">
-              <button id="resetFilter">Reset Filter</button>
-              <button id="applyFilter">Apply Filter</button>
-            </div>
+    #row {
+      background-color: white;
+      padding: 5px;
+    }
+
+    #row button {
+      margin-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- coustum layout element di sini -->
+  <div id="appContainer">
+    <div id="viewDiv">
+      <div id="filterContainer">
+        <div class="row">
+          <span class="closeButton">X</span>
+          <h3>Filter Layer</h3>
+          <div class="select-container">
+            <select id="filterField"></select>
+            <select id="filterValue">
+              <option value="">Select value</option>
+            </select>
+          </div>
+          <div class="button-container">
+            <button id="resetFilter">Reset Filter</button>
+            <button id="applyFilter">Apply Filter</button>
           </div>
         </div>
       </div>
-      <div id="tableContainer" class="container">
-        <div id="row">
-          <label for="kelurahanFilter">Filter by Kelurahan:</label>
-          <select id="kelurahanFilter">
-            <option disabled selected>Select a Kelurahan</option>
-          </select>
-          <button id="applyKelurahanFilterBtn">Apply Kelurahan Filter</button>
-
-          <label for="rwFilter">Filter by RW:</label>
-          <select id="rwFilter">
-            <option disabled selected>Select a RW</option>
-          </select>
-          <button id="applyRwFilterBtn">Apply RW Filter</button>
-
-          <button id="resetFilterBtn">Reset Filter</button>
-        </div>
-        <div id="row">
-          <label for="searchName">Search Kelurahan:</label>
-          <input type="text" id="searchName" placeholder="Enter name" />
-          <button id="searchBtn">Search</button>
-          <button id="clearBtn">Clear</button>
-        </div>
-        <div id="tableDiv"></div>
-      </div>
     </div>
+    <div id="tableContainer" class="container">
+      <div id="row">
+        <label for="kelurahanFilter">Filter by Kelurahan:</label>
+        <select id="kelurahanFilter">
+          <option disabled selected>Select a Kelurahan</option>
+        </select>
+        <button id="applyKelurahanFilterBtn">Apply Kelurahan Filter</button>
 
-    <!-- Script untuk nama SKPD -->
-    <script type="text/plain" id="skpd">
+        <label for="rwFilter">Filter by RW:</label>
+        <select id="rwFilter">
+          <option disabled selected>Select a RW</option>
+        </select>
+        <button id="applyRwFilterBtn">Apply RW Filter</button>
+
+        <button id="resetFilterBtn">Reset Filter</button>
+      </div>
+      <div id="row">
+        <label for="searchName">Search Kelurahan:</label>
+        <input type="text" id="searchName" placeholder="Enter name" />
+        <button id="searchBtn">Search</button>
+        <button id="clearBtn">Clear</button>
+      </div>
+      <div id="tableDiv"></div>
+    </div>
+  </div>
+
+  <!-- Script untuk nama SKPD -->
+  <script type="text/plain" id="skpd">
       if (IsEmpty(geometry($feature))) {
         return null;
       } else {
@@ -152,553 +151,577 @@
       }
     </script>
 
-    <!-- coustum javascript di sini -->
-    <script>
-      //Instal modul yang diperlukan saja, jangan lupa di load di function
-      require([
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/layers/FeatureLayer",
-        "esri/widgets/FeatureTable",
-        "esri/widgets/Legend",
-        "esri/widgets/LayerList",
-        "esri/widgets/Expand",
-        "esri/widgets/BasemapGallery",
-        "esri/widgets/Editor",
-        "esri/widgets/Search",
-        "esri/widgets/Compass",
-        "esri/widgets/Fullscreen",
-        "esri/widgets/Locate",
-        "esri/widgets/Home",
-        "esri/form/ExpressionInfo",
-        "esri/form/FormTemplate",
-        "esri/form/elements/FieldElement",
-        "esri/core/reactiveUtils",
-      ], function (
-        Map,
-        MapView,
-        FeatureLayer,
-        FeatureTable,
-        Legend,
-        LayerList,
-        Expand,
-        BasemapGallery,
-        Editor,
-        Search,
-        Compass,
-        Fullscreen,
-        Locate,
-        Home,
-        ExpressionInfo,
-        formTemplate,
-        FieldElement,
-        reactiveUtil
-      ) {
-        const appContainer = document.getElementById("appContainer");
-        const tableContainer = document.getElementById("tableContainer");
-        const tableDiv = document.getElementById("tableDiv");
+  <!-- coustum javascript di sini -->
+  <script>
+    //Instal modul yang diperlukan saja, jangan lupa di load di function
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/widgets/FeatureTable",
+      "esri/widgets/Legend",
+      "esri/widgets/LayerList",
+      "esri/widgets/Expand",
+      "esri/widgets/BasemapGallery",
+      "esri/widgets/Editor",
+      "esri/widgets/Search",
+      "esri/widgets/Compass",
+      "esri/widgets/Fullscreen",
+      "esri/widgets/Locate",
+      "esri/widgets/Home",
+      "esri/form/ExpressionInfo",
+      "esri/form/FormTemplate",
+      "esri/form/elements/FieldElement",
+      "esri/core/reactiveUtils",
+    ], function (
+      Map,
+      MapView,
+      FeatureLayer,
+      FeatureTable,
+      Legend,
+      LayerList,
+      Expand,
+      BasemapGallery,
+      Editor,
+      Search,
+      Compass,
+      Fullscreen,
+      Locate,
+      Home,
+      ExpressionInfo,
+      formTemplate,
+      FieldElement,
+      reactiveUtil
+    ) {
+      const appContainer = document.getElementById("appContainer");
+      const tableContainer = document.getElementById("tableContainer");
+      const tableDiv = document.getElementById("tableDiv");
 
-        // buat peta beserta basemap tampilan
-        const map = new Map({
-          basemap: "osm",
-        });
-
-        // buat tampilan peta
-        const view = new MapView({
-          container: "viewDiv",
-          map: map,
-          center: [106.827, -6.175], // Longitude, latitude untuk monas Jakarta
-          zoom: 15, //rentang zoom dari (1-23)
-        });
-
-        // tambahkan Feature Layer
-        const layer_satu = new FeatureLayer({
-          url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Batas_Admin_RT_PetaKerja/FeatureServer",
-          title: "Batas RT",
-          outFields: ["*"],
-        });
-        map.add(layer_satu);
-
-        // Buat Pop Up dan Attachment
-        const template = {
-          title: "Contoh",
-          content: [
-            {
-              type: "text",
-              text: '<div style="text-align: center;"><strong>INFORMASI TABEL</strong></div>',
-            },
-            {
-              type: "fields",
-              fieldInfos: [],
-            },
-            {
-              type: "text",
-              text: '<div style="text-align: center; "><strong>LAMPIRAN</strong></div>',
-            },
-            {
-              type: "attachments",
-            },
-          ],
-        };
-
-        layer_satu.when(() => {
-          const fields = layer_satu.fields;
-          const fieldNameToExclude = [
-            "SHAPE__Length",
-            "SHAPE__Area",
-            "shape",
-            "globalid",
-            "objectid",
-          ];
-          const fieldInfos = fields
-            // .filter(field => field.name !== fieldNameToExclude)
-            .filter((field) => !fieldNameToExclude.includes(field.name))
-            .map((field) => ({
-              fieldName: field.name,
-              label: field.alias || field.name,
-              format: field.format,
-            }));
-          template.content[1].fieldInfos = fieldInfos;
-          layer_satu.popupTemplate = template;
-        });
-
-        // buat dan tambahkan Attribute Table widget
-        const featureTable = new FeatureTable({
-          view: view,
-          layer: layer_satu,
-          visibleElements: {
-            // Autocast to VisibleElements
-            menuItems: {
-              clearSelection: true,
-              refreshData: true,
-              toggleColumns: true,
-              selectedRecordsShowAllToggle: true,
-              selectedRecordsShowSelectedToggle: true,
-              zoomToSelection: true,
-            },
-          },
-          container: tableDiv,
-        });
-
-        // Tambahkan tombol untuk toggle feature table
-        const toggleButton = document.createElement("button");
-        toggleButton.innerHTML = '<span class="esri-icon-table"></span>';
-        toggleButton.className =
-          "esri-widget--button esri-widget esri-interactive";
-        toggleButton.onclick = () => {
-          if (tableContainer.style.display === "flex") {
-            tableContainer.style.display = "none";
-          } else {
-            tableContainer.style.display = "flex";
+      // buat pengaturan label 
+      const labelClass = {
+        // autocasts as new LabelClass()
+        symbol: {
+          type: "text", // autocasts as new TextSymbol()
+          color: "black",
+          yoffset: 0,
+          font: {
+            // autocast as new Font()
+            family: "Serif",
+            size: 8,
+            weight: "bold"
           }
-        };
+        },
+        labelPlacement: "PolygonAlwaysHorizontal",
+        labelExpressionInfo: {
+          expression: "'RT '+ $feature.wadmrt"
+        },
+        minScale: 3000
+      };
 
-        // Zoom to feature function
-        function zoomToFeature(oid) {
+
+      // buat peta beserta basemap tampilan
+      const map = new Map({
+        basemap: "osm",
+      });
+
+      // buat tampilan peta
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [106.827, -6.175], // Longitude, latitude untuk monas Jakarta
+        zoom: 15, //rentang zoom dari (1-23)
+      });
+
+      // tambahkan Feature Layer
+      const layer_satu = new FeatureLayer({
+        url: "https://tataruang.jakarta.go.id/server/rest/services/Hosted/Batas_Admin_RT_PetaKerja/FeatureServer",
+        title: "Batas RT",
+        outFields: ["*"],
+        labelingInfo: [labelClass]
+      });
+      map.add(layer_satu);
+
+      // Buat Pop Up dan Attachment
+      const template = {
+        title: "Contoh",
+        content: [
+          {
+            type: "text",
+            text: '<div style="text-align: center;"><strong>INFORMASI TABEL</strong></div>',
+          },
+          {
+            type: "fields",
+            fieldInfos: [],
+          },
+          {
+            type: "text",
+            text: '<div style="text-align: center; "><strong>LAMPIRAN</strong></div>',
+          },
+          {
+            type: "attachments",
+          },
+        ],
+      };
+
+      layer_satu.when(() => {
+        const fields = layer_satu.fields;
+        const fieldNameToExclude = [
+          "SHAPE__Length",
+          "SHAPE__Area",
+          "shape",
+          "globalid",
+          "objectid",
+        ];
+        const fieldInfos = fields
+          // .filter(field => field.name !== fieldNameToExclude)
+          .filter((field) => !fieldNameToExclude.includes(field.name))
+          .map((field) => ({
+            fieldName: field.name,
+            label: field.alias || field.name,
+            format: field.format,
+          }));
+        template.content[1].fieldInfos = fieldInfos;
+        layer_satu.popupTemplate = template;
+      });
+
+      // buat dan tambahkan Attribute Table widget
+      const featureTable = new FeatureTable({
+        view: view,
+        layer: layer_satu,
+        visibleElements: {
+          // Autocast to VisibleElements
+          menuItems: {
+            clearSelection: true,
+            refreshData: true,
+            toggleColumns: true,
+            selectedRecordsShowAllToggle: true,
+            selectedRecordsShowSelectedToggle: true,
+            zoomToSelection: true,
+          },
+        },
+        container: tableDiv,
+      });
+
+      // Tambahkan tombol untuk toggle feature table
+      const toggleButton = document.createElement("button");
+      toggleButton.innerHTML = '<span class="esri-icon-table"></span>';
+      toggleButton.className =
+        "esri-widget--button esri-widget esri-interactive";
+      toggleButton.onclick = () => {
+        if (tableContainer.style.display === "flex") {
+          tableContainer.style.display = "none";
+        } else {
+          tableContainer.style.display = "flex";
+        }
+      };
+
+      // Zoom to feature function
+      function zoomToFeature(oid) {
+        layer_satu
+          .queryFeatures({
+            objectIds: [oid],
+          })
+          .then((result) => {
+            if (result.features.length > 0) {
+              const feature = result.features[0];
+              view.goTo({
+                target: feature.geometry,
+                zoom: 15,
+              });
+            }
+          });
+      }
+
+      // Create a custom button in the table
+      function createZoomToButton(feature) {
+        const button = document.createElement("button");
+        button.textContent = "Zoom To";
+        button.classList.add("zoom-button");
+        button.addEventListener("click", () => {
+          zoomToFeature(feature.attributes.OBJECTID);
+        });
+        return button;
+      }
+
+      // Custom renderer for the table to include Zoom To button
+      featureTable.on("data-changed", () => {
+        const rows = document.querySelectorAll(".esri-feature-table__row");
+        rows.forEach((row) => {
+          const oid = row.getAttribute("data-objectid");
+          const button = createZoomToButton({
+            attributes: { OBJECTID: oid },
+          });
+          const cell = row.querySelector(
+            ".esri-feature-table__cell:last-child"
+          ); // Append to the last cell
+          cell.appendChild(button);
+        });
+      });
+
+      // Populate Kelurahan dropdown with unique names
+      layer_satu
+        .queryFeatures({
+          where: "1=1",
+          outFields: ["wadmkd"],
+          returnDistinctValues: true,
+          orderByFields: ["wadmkd"],
+        })
+        .then((result) => {
+          const kelurahanDropdown =
+            document.getElementById("kelurahanFilter");
+          kelurahanDropdown.innerHTML =
+            "<option disabled selected>Select a Kelurahan Name</option>";
+          result.features.forEach((feature) => {
+            const option = document.createElement("option");
+            option.value = feature.attributes.wadmkd;
+            option.text = feature.attributes.wadmkd;
+            kelurahanDropdown.appendChild(option);
+          });
+        });
+
+      // Function to apply the Kelurahan filter and populate RW dropdown
+      function applyKelurahanFilter() {
+        const selectedKelurahan =
+          document.getElementById("kelurahanFilter").value;
+
+        if (selectedKelurahan) {
+          layer_satu.definitionExpression = `wadmkd = '${selectedKelurahan}'`;
+
           layer_satu
             .queryFeatures({
-              objectIds: [oid],
+              where: `wadmkd = '${selectedKelurahan}'`,
+              outFields: ["wadmrw"],
+              returnDistinctValues: true,
+              orderByFields: ["wadmrw"],
             })
             .then((result) => {
+              const rwDropdown = document.getElementById("rwFilter");
+              rwDropdown.innerHTML =
+                "<option disabled selected>Select a RW</option>";
+
+              result.features.forEach((feature) => {
+                const option = document.createElement("option");
+                option.value = feature.attributes.wadmrw;
+                option.text = feature.attributes.wadmrw;
+                rwDropdown.appendChild(option);
+              });
+
               if (result.features.length > 0) {
-                const feature = result.features[0];
-                view.goTo({
-                  target: feature.geometry,
-                  zoom: 15,
-                });
+                zoomToFeature(result.features[0].attributes.objectId); // Adjust this based on your actual objectId attribute
               }
             });
         }
+      }
 
-        // Create a custom button in the table
-        function createZoomToButton(feature) {
-          const button = document.createElement("button");
-          button.textContent = "Zoom To";
-          button.classList.add("zoom-button");
-          button.addEventListener("click", () => {
-            zoomToFeature(feature.attributes.OBJECTID);
-          });
-          return button;
+      // Apply filter based on both Kelurahan and RW selection
+      function applyRwFilter() {
+        const selectedKelurahan =
+          document.getElementById("kelurahanFilter").value;
+        const selectedRw = document.getElementById("rwFilter").value;
+
+        if (selectedKelurahan && selectedRw) {
+          layer_satu.definitionExpression = `wadmkd = '${selectedKelurahan}' AND wadmrw = '${selectedRw}'`;
         }
+      }
 
-        // Custom renderer for the table to include Zoom To button
-        featureTable.on("data-changed", () => {
-          const rows = document.querySelectorAll(".esri-feature-table__row");
-          rows.forEach((row) => {
-            const oid = row.getAttribute("data-objectid");
-            const button = createZoomToButton({
-              attributes: { OBJECTID: oid },
-            });
-            const cell = row.querySelector(
-              ".esri-feature-table__cell:last-child"
-            ); // Append to the last cell
-            cell.appendChild(button);
-          });
-        });
+      // Reset filters
+      function resetFilter1() {
+        document.getElementById("kelurahanFilter").selectedIndex = 0;
+        document.getElementById("rwFilter").innerHTML =
+          "<option disabled selected>Select a RW</option>";
+        layer_satu.definitionExpression = null;
+      }
 
-        // Populate Kelurahan dropdown with unique names
-        layer_satu
-          .queryFeatures({
-            where: "1=1",
-            outFields: ["wadmkd"],
-            returnDistinctValues: true,
-            orderByFields: ["wadmkd"],
-          })
-          .then((result) => {
-            const kelurahanDropdown =
-              document.getElementById("kelurahanFilter");
-            kelurahanDropdown.innerHTML =
-              "<option disabled selected>Select a Kelurahan Name</option>";
-            result.features.forEach((feature) => {
-              const option = document.createElement("option");
-              option.value = feature.attributes.wadmkd;
-              option.text = feature.attributes.wadmkd;
-              kelurahanDropdown.appendChild(option);
-            });
-          });
+      // Event listeners for buttons
+      document
+        .getElementById("applyKelurahanFilterBtn")
+        .addEventListener("click", applyKelurahanFilter);
+      document
+        .getElementById("applyRwFilterBtn")
+        .addEventListener("click", applyRwFilter);
+      document
+        .getElementById("resetFilterBtn")
+        .addEventListener("click", resetFilter1);
 
-        // Function to apply the Kelurahan filter and populate RW dropdown
-        function applyKelurahanFilter() {
-          const selectedKelurahan =
-            document.getElementById("kelurahanFilter").value;
+      // Function to search data by kelurahan column
+      function searchByKelurahan() {
+        const searchText = document.getElementById("searchName").value.trim();
 
-          if (selectedKelurahan) {
-            layer_satu.definitionExpression = `wadmkd = '${selectedKelurahan}'`;
+        if (searchText) {
+          // Update definition expression to filter by search text
+          layer_satu.definitionExpression = `LOWER(wadmkd) LIKE LOWER('%${searchText}%')`; // Karena databasenya case-sensitif
 
-            layer_satu
-              .queryFeatures({
-                where: `wadmkd = '${selectedKelurahan}'`,
-                outFields: ["wadmrw"],
-                returnDistinctValues: true,
-                orderByFields: ["wadmrw"],
-              })
-              .then((result) => {
-                const rwDropdown = document.getElementById("rwFilter");
-                rwDropdown.innerHTML =
-                  "<option disabled selected>Select a RW</option>";
-
-                result.features.forEach((feature) => {
-                  const option = document.createElement("option");
-                  option.value = feature.attributes.wadmrw;
-                  option.text = feature.attributes.wadmrw;
-                  rwDropdown.appendChild(option);
-                });
-
-                if (result.features.length > 0) {
-                  zoomToFeature(result.features[0].attributes.objectId); // Adjust this based on your actual objectId attribute
-                }
-              });
-          }
-        }
-
-        // Apply filter based on both Kelurahan and RW selection
-        function applyRwFilter() {
-          const selectedKelurahan =
-            document.getElementById("kelurahanFilter").value;
-          const selectedRw = document.getElementById("rwFilter").value;
-
-          if (selectedKelurahan && selectedRw) {
-            layer_satu.definitionExpression = `wadmkd = '${selectedKelurahan}' AND wadmrw = '${selectedRw}'`;
-          }
-        }
-
-        // Reset filters
-        function resetFilter1() {
-          document.getElementById("kelurahanFilter").selectedIndex = 0;
-          document.getElementById("rwFilter").innerHTML =
-            "<option disabled selected>Select a RW</option>";
+          // Optionally, you may want to refresh the feature table or layer after filtering
+          layer_satu.refresh();
+        } else {
+          // If search text is empty, remove the definition expression
           layer_satu.definitionExpression = null;
         }
+      }
 
-        // Event listeners for buttons
-        document
-          .getElementById("applyKelurahanFilterBtn")
-          .addEventListener("click", applyKelurahanFilter);
-        document
-          .getElementById("applyRwFilterBtn")
-          .addEventListener("click", applyRwFilter);
-        document
-          .getElementById("resetFilterBtn")
-          .addEventListener("click", resetFilter1);
+      // Event listener for the search button
+      document
+        .getElementById("searchBtn")
+        .addEventListener("click", searchByKelurahan);
 
-        // Function to search data by kelurahan column
-        function searchByKelurahan() {
-          const searchText = document.getElementById("searchName").value.trim();
+      // Function to clear search and filters
+      function clearFilters() {
+        // Clear the search input
+        document.getElementById("searchName").value = "";
 
-          if (searchText) {
-            // Update definition expression to filter by search text
-            layer_satu.definitionExpression = `LOWER(wadmkd) LIKE LOWER('%${searchText}%')`; // Karena databasenya case-sensitif
+        // Reset the Kelurahan and RW dropdowns
+        document.getElementById("kelurahanFilter").selectedIndex = 0;
+        document.getElementById("rwFilter").innerHTML =
+          "<option disabled selected>Select a RW</option>";
 
-            // Optionally, you may want to refresh the feature table or layer after filtering
-            layer_satu.refresh();
-          } else {
-            // If search text is empty, remove the definition expression
-            layer_satu.definitionExpression = null;
-          }
-        }
+        // Remove definition expression
+        layer_satu.definitionExpression = null;
+      }
 
-        // Event listener for the search button
-        document
-          .getElementById("searchBtn")
-          .addEventListener("click", searchByKelurahan);
+      // Event listener for the clear button
+      document
+        .getElementById("clearBtn")
+        .addEventListener("click", clearFilters);
 
-        // Function to clear search and filters
-        function clearFilters() {
-          // Clear the search input
-          document.getElementById("searchName").value = "";
-
-          // Reset the Kelurahan and RW dropdowns
-          document.getElementById("kelurahanFilter").selectedIndex = 0;
-          document.getElementById("rwFilter").innerHTML =
-            "<option disabled selected>Select a RW</option>";
-
-          // Remove definition expression
-          layer_satu.definitionExpression = null;
-        }
-
-        // Event listener for the clear button
-        document
-          .getElementById("clearBtn")
-          .addEventListener("click", clearFilters);
-
-        // buat dan tambahkan Layer List (letakan di kanan atas)
-        const layerList = new LayerList({
-          view: view,
-        });
-
-        const expandList = new Expand({
-          view: view,
-          content: layerList,
-          group: "top-right",
-          // expanded: true
-        });
-
-        // buat dan tambahkan Legenda (letakkan di kanan atas)
-        const legend = new Legend({
-          view: view,
-        });
-
-        const expandLegend = new Expand({
-          view: view,
-          content: legend,
-          group: "top-right",
-        });
-
-        // buat dan tambahkan Pemilihan basemap (letakan di kanan atas)
-        const basemapGallery = new BasemapGallery({
-          view: view,
-        });
-
-        const expandBasemap = new Expand({
-          view: view,
-          content: basemapGallery,
-          group: "top-right",
-        });
-
-        // Tambahkan tombol untuk toggle filter table
-        const filterButton = document.createElement("button");
-        filterButton.innerHTML = '<span class="esri-icon-filter"></span>';
-        filterButton.className =
-          "esri-widget--button esri-widget esri-interactive";
-        filterButton.onclick = () => {
-          if (filterContainer.style.display === "flex") {
-            filterContainer.style.display = "none";
-          } else {
-            filterContainer.style.display = "flex";
-          }
-        };
-
-        // Populate filter fields
-        layer_satu.when(() => {
-          const fields = layer_satu.fields;
-          fields.forEach((field) => {
-            const filterOption = document.createElement("option");
-            filterOption.value = field.name;
-            filterOption.text = field.alias || field.name;
-            document.getElementById("filterField").appendChild(filterOption);
-          });
-        });
-
-        // Load filter values when field changes
-        document
-          .getElementById("filterField")
-          .addEventListener("change", () => {
-            const selectedField = document.getElementById("filterField").value;
-            const filterValueSelect = document.getElementById("filterValue");
-            filterValueSelect.innerHTML =
-              '<option value="">Select value</option>';
-
-            if (!selectedField) return;
-
-            // Create query to get distinct values for the selected field
-            const query = layer_satu.createQuery();
-            query.returnDistinctValues = true;
-            query.outFields = [selectedField];
-            query.orderByFields = [selectedField]; // Ensure order
-            layer_satu.queryFeatures(query).then((result) => {
-              result.features.forEach((feature) => {
-                const value = feature.attributes[selectedField];
-                if (value !== null && value !== undefined) {
-                  const option = document.createElement("option");
-                  option.value = value;
-                  option.text = value;
-                  filterValueSelect.appendChild(option);
-                }
-              });
-            });
-          });
-
-        // Close filter container
-        document.querySelector(".closeButton").addEventListener("click", () => {
-          document.getElementById("filterContainer").style.display = "none";
-        });
-
-        function updateFeatureTable() {
-          // Memperbarui tabel atribut dengan data yang terfilter
-          featureTable.layer = layer_satu; // Reassign the layer to refresh the table
-          featureTable.refresh();
-        }
-
-        // Apply filter
-        document.getElementById("applyFilter").addEventListener("click", () => {
-          const field = document.getElementById("filterField").value;
-          const value = document.getElementById("filterValue").value;
-          const query = `${field} = '${value}'`;
-
-          layer_satu.definitionExpression = query;
-          updateFeatureTable();
-
-          // Zoom to filtered features
-          const queryToZoom = layer_satu.createQuery();
-          queryToZoom.where = query;
-          queryToZoom.outFields = ["*"]; // Retrieve all fields including geometry
-
-          layer_satu.queryFeatures(queryToZoom).then((result) => {
-            if (result.features.length > 0) {
-              // Use the extent of all features to zoom
-              const extent = result.features.reduce((acc, feature) => {
-                return acc.union(feature.geometry.extent);
-              }, result.features[0].geometry.extent);
-
-              view
-                .goTo(extent)
-                .then(() => {
-                  console.log("Zoomed to filtered location");
-                })
-                .catch((error) => {
-                  console.error("Zoom failed: ", error);
-                });
-            } else {
-              console.log("No features found for the filter.");
-            }
-          });
-        });
-
-        // Reset filter
-        document.getElementById("resetFilter").addEventListener("click", () => {
-          layer_satu.definitionExpression = null;
-          updateFeatureTable();
-          document.getElementById("filterContainer").classList.remove("active");
-        });
-
-        // Default SKPD
-        const skpdExpression = new ExpressionInfo({
-          expression: document.getElementById("skpd").text,
-          name: "skpd",
-        });
-
-        const skpdFieldElement = new FieldElement({
-          label: "skpd",
-          fieldName: "skpd",
-          editableExpression: "false",
-          input: {
-            type: "text-box",
-            maxLength: 150,
-          },
-          valueExpression: "skpd",
-        });
-
-        // buat dan tambahkan editor (letakan di kanan atas)
-        const editor = new Editor({
-          view: view,
-          layerInfos: [
-            {
-              layer: layer_satu,
-              formTemplate: {
-                elements: [
-                  {
-                    type: "field",
-                    fieldName: "wadmkd",
-                    label: "KELURAHAN",
-                  },
-                  {
-                    type: "field",
-                    fieldName: "wadmkc",
-                    label: "KECAMATAN",
-                  },
-                  skpdFieldElement,
-                ],
-                expressionInfos: [skpdExpression],
-              },
-            },
-          ],
-        });
-
-        const expandEditor = new Expand({
-          view: view,
-          content: editor,
-          group: "top-right",
-        });
-
-        // buat dan tambahkan search, arah utara, fullscreen (letakan di kiri atas)
-        const searchWidget = new Search({
-          view: view,
-          group: "top-left",
-        });
-
-        const expandSearch = new Expand({
-          view: view,
-          content: searchWidget,
-          group: "top-right",
-        });
-
-        const compassWidget = new Compass({
-          view: view,
-          group: "top-left",
-        });
-
-        const fullscreen = new Fullscreen({
-          view: view,
-          group: "top-left",
-          element: appContainer,
-        });
-
-        // buat dan tambahkan widget locate dan home (sebelah kiri atas/bawah)
-        const locate = new Locate({
-          view: view,
-          group: "top-left",
-        });
-
-        const home = new Home({
-          view: view,
-          group: "top-left",
-        });
-
-        // ui seluruhnya
-        view.ui.add(
-          [
-            expandSearch,
-            expandList,
-            expandBasemap,
-            expandLegend,
-            expandEditor,
-            toggleButton,
-          ],
-          "top-right"
-        );
-        view.ui.add([compassWidget, home, locate, fullscreen], "top-left");
-        view.ui.add([filterButton], "bottom-right");
+      // buat dan tambahkan Layer List (letakan di kanan atas)
+      const layerList = new LayerList({
+        view: view,
       });
-    </script>
-  </body>
+
+      const expandList = new Expand({
+        view: view,
+        content: layerList,
+        group: "top-right",
+        // expanded: true
+      });
+
+      // buat dan tambahkan Legenda (letakkan di kanan atas)
+      const legend = new Legend({
+        view: view,
+      });
+
+      const expandLegend = new Expand({
+        view: view,
+        content: legend,
+        group: "top-right",
+      });
+
+      // buat dan tambahkan Pemilihan basemap (letakan di kanan atas)
+      const basemapGallery = new BasemapGallery({
+        view: view,
+      });
+
+      const expandBasemap = new Expand({
+        view: view,
+        content: basemapGallery,
+        group: "top-right",
+      });
+
+      // Tambahkan tombol untuk toggle filter table
+      const filterButton = document.createElement("button");
+      filterButton.innerHTML = '<span class="esri-icon-filter"></span>';
+      filterButton.className =
+        "esri-widget--button esri-widget esri-interactive";
+      filterButton.onclick = () => {
+        if (filterContainer.style.display === "flex") {
+          filterContainer.style.display = "none";
+        } else {
+          filterContainer.style.display = "flex";
+        }
+      };
+
+      // Populate filter fields
+      layer_satu.when(() => {
+        const fields = layer_satu.fields;
+        fields.forEach((field) => {
+          const filterOption = document.createElement("option");
+          filterOption.value = field.name;
+          filterOption.text = field.alias || field.name;
+          document.getElementById("filterField").appendChild(filterOption);
+        });
+      });
+
+      // Load filter values when field changes
+      document
+        .getElementById("filterField")
+        .addEventListener("change", () => {
+          const selectedField = document.getElementById("filterField").value;
+          const filterValueSelect = document.getElementById("filterValue");
+          filterValueSelect.innerHTML =
+            '<option value="">Select value</option>';
+
+          if (!selectedField) return;
+
+          // Create query to get distinct values for the selected field
+          const query = layer_satu.createQuery();
+          query.returnDistinctValues = true;
+          query.outFields = [selectedField];
+          query.orderByFields = [selectedField]; // Ensure order
+          layer_satu.queryFeatures(query).then((result) => {
+            result.features.forEach((feature) => {
+              const value = feature.attributes[selectedField];
+              if (value !== null && value !== undefined) {
+                const option = document.createElement("option");
+                option.value = value;
+                option.text = value;
+                filterValueSelect.appendChild(option);
+              }
+            });
+          });
+        });
+
+      // Close filter container
+      document.querySelector(".closeButton").addEventListener("click", () => {
+        document.getElementById("filterContainer").style.display = "none";
+      });
+
+      function updateFeatureTable() {
+        // Memperbarui tabel atribut dengan data yang terfilter
+        featureTable.layer = layer_satu; // Reassign the layer to refresh the table
+        featureTable.refresh();
+      }
+
+      // Apply filter
+      document.getElementById("applyFilter").addEventListener("click", () => {
+        const field = document.getElementById("filterField").value;
+        const value = document.getElementById("filterValue").value;
+        const query = `${field} = '${value}'`;
+
+        layer_satu.definitionExpression = query;
+        updateFeatureTable();
+
+        // Zoom to filtered features
+        const queryToZoom = layer_satu.createQuery();
+        queryToZoom.where = query;
+        queryToZoom.outFields = ["*"]; // Retrieve all fields including geometry
+
+        layer_satu.queryFeatures(queryToZoom).then((result) => {
+          if (result.features.length > 0) {
+            // Use the extent of all features to zoom
+            const extent = result.features.reduce((acc, feature) => {
+              return acc.union(feature.geometry.extent);
+            }, result.features[0].geometry.extent);
+
+            view
+              .goTo(extent)
+              .then(() => {
+                console.log("Zoomed to filtered location");
+              })
+              .catch((error) => {
+                console.error("Zoom failed: ", error);
+              });
+          } else {
+            console.log("No features found for the filter.");
+          }
+        });
+      });
+
+      // Reset filter
+      document.getElementById("resetFilter").addEventListener("click", () => {
+        layer_satu.definitionExpression = null;
+        updateFeatureTable();
+        document.getElementById("filterContainer").classList.remove("active");
+      });
+
+      // Default SKPD
+      const skpdExpression = new ExpressionInfo({
+        expression: document.getElementById("skpd").text,
+        name: "skpd",
+      });
+
+      const skpdFieldElement = new FieldElement({
+        label: "skpd",
+        fieldName: "skpd",
+        editableExpression: "false",
+        input: {
+          type: "text-box",
+          maxLength: 150,
+        },
+        valueExpression: "skpd",
+      });
+
+      // buat dan tambahkan editor (letakan di kanan atas)
+      const editor = new Editor({
+        view: view,
+        layerInfos: [
+          {
+            layer: layer_satu,
+            formTemplate: {
+              elements: [
+                {
+                  type: "field",
+                  fieldName: "wadmkd",
+                  label: "KELURAHAN",
+                },
+                {
+                  type: "field",
+                  fieldName: "wadmkc",
+                  label: "KECAMATAN",
+                },
+                skpdFieldElement,
+              ],
+              expressionInfos: [skpdExpression],
+            },
+          },
+        ],
+      });
+
+      const expandEditor = new Expand({
+        view: view,
+        content: editor,
+        group: "top-right",
+      });
+
+      // buat dan tambahkan search, arah utara, fullscreen (letakan di kiri atas)
+      const searchWidget = new Search({
+        view: view,
+        group: "top-left",
+      });
+
+      const expandSearch = new Expand({
+        view: view,
+        content: searchWidget,
+        group: "top-right",
+      });
+
+      const compassWidget = new Compass({
+        view: view,
+        group: "top-left",
+      });
+
+      const fullscreen = new Fullscreen({
+        view: view,
+        group: "top-left",
+        element: appContainer,
+      });
+
+      // buat dan tambahkan widget locate dan home (sebelah kiri atas/bawah)
+      const locate = new Locate({
+        view: view,
+        group: "top-left",
+      });
+
+      const home = new Home({
+        view: view,
+        group: "top-left",
+      });
+
+      // ui seluruhnya
+      view.ui.add(
+        [
+          expandSearch,
+          expandList,
+          expandBasemap,
+          expandLegend,
+          expandEditor,
+          toggleButton,
+        ],
+        "top-right"
+      );
+      view.ui.add([compassWidget, home, locate, fullscreen], "top-left");
+      view.ui.add([filterButton], "bottom-right");
+    });
+  </script>
+</body>
+
 </html>
