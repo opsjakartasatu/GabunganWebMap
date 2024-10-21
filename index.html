@@ -302,6 +302,40 @@
               zoomToSelection: true,
             },
           },
+          tableTemplate: {
+            columnTemplates: [
+              {
+                type: "field",
+                fieldName: "WADMRT",
+                label: "NO RT",
+              },
+              {
+                type: "field",
+                fieldName: "WADMRW",
+                label: "NO RW",
+              },
+              {
+                type: "field",
+                fieldName: "WADMKD",
+                label: "KELURAHAN",
+              },
+              {
+                type: "field",
+                fieldName: "WADMKC",
+                label: "KECAMATAN",
+              },
+              {
+                type: "field",
+                fieldName: "WADMKK",
+                label: "WILAYAH",
+              },
+              {
+                type: "field",
+                fieldName: "Dinas_PRKP",
+                label: "DINAS",
+              },
+            ],
+          },
           container: tableDiv,
         });
 
@@ -500,99 +534,98 @@
                 {
                   title: "Go to full extent",
                   icon: "zoom-out-fixed",
-                  id: "full-extent"
+                  id: "full-extent",
                 },
                 {
                   title: "Layer information",
                   icon: "information",
-                  id: "information"
-                }
+                  id: "information",
+                },
               ],
               [
                 {
                   title: "Increase opacity",
                   icon: "chevron-up",
-                  id: "increase-opacity"
+                  id: "increase-opacity",
                 },
                 {
                   title: "Decrease opacity",
                   icon: "chevron-down",
-                  id: "decrease-opacity"
-                }
-              ]
+                  id: "decrease-opacity",
+                },
+              ],
             ];
           }
 
           // Adds a slider for updating a group layer's opacity
           // if (item.children.length > 1 && item.parent) {
-            const slider = new Slider({
-              min: 0,
-              max: 1,
-              precision: 2,
-              values: [1],
-              visibleElements: {
-                labels: true,
-                rangeLabels: true
-              }
-            });
+          const slider = new Slider({
+            min: 0,
+            max: 1,
+            precision: 2,
+            values: [1],
+            visibleElements: {
+              labels: true,
+              rangeLabels: true,
+            },
+          });
 
-            item.panel = {
-              content: slider,
-              icon: "sliders-horizontal",
-              title: "Change layer opacity"
-            };
+          item.panel = {
+            content: slider,
+            icon: "sliders-horizontal",
+            title: "Change layer opacity",
+          };
 
-            // Watch the slider's values array and update the layer's opacity
-            reactiveUtils.watch(
-              () => slider.values.map((value) => value),
-              (values) => (item.layer.opacity = values[0])
-            );
+          // Watch the slider's values array and update the layer's opacity
+          reactiveUtils.watch(
+            () => slider.values.map((value) => value),
+            (values) => (item.layer.opacity = values[0])
+          );
           // }
         }
 
-          // Create the LayerList widget with the associated actions
-          // and add it to the top-right corner of the view.
-          const layerList = new LayerList({
-            view: view,
-            // executes for each ListItem in the LayerList
-            listItemCreatedFunction: defineActions
-          });
+        // Create the LayerList widget with the associated actions
+        // and add it to the top-right corner of the view.
+        const layerList = new LayerList({
+          view: view,
+          // executes for each ListItem in the LayerList
+          listItemCreatedFunction: defineActions,
+        });
 
-          // Event listener that fires each time an action is triggered
-          layerList.on("trigger-action", (event) => {
-            // The layer visible in the view at the time of the trigger.
-            // const visibleLayer = USALayer.visible ? USALayer : censusLayer;
+        // Event listener that fires each time an action is triggered
+        layerList.on("trigger-action", (event) => {
+          // The layer visible in the view at the time of the trigger.
+          // const visibleLayer = USALayer.visible ? USALayer : censusLayer;
 
-            // Capture the action id.
-            const id = event.action.id;
+          // Capture the action id.
+          const id = event.action.id;
 
-            if (id === "full-extent") {
-              // If the full-extent action is triggered then navigate
-              // to the full extent of the visible layer
-              view.goTo(layer_satu.fullExtent).catch((error) => {
-                if (error.name != "AbortError") {
-                  console.error(error);
-                }
-              });
-            } else if (id === "information") {
-              // If the information action is triggered, then
-              // open the item details page of the service layer
-              window.open(layer_satu.url);
-            } else if (id === "increase-opacity") {
-              // If the increase-opacity action is triggered, then
-              // increase the opacity of the GroupLayer by 0.25
-              if (layer_satu.opacity < 1) {
-                layer_satu.opacity += 0.25;
+          if (id === "full-extent") {
+            // If the full-extent action is triggered then navigate
+            // to the full extent of the visible layer
+            view.goTo(layer_satu.fullExtent).catch((error) => {
+              if (error.name != "AbortError") {
+                console.error(error);
               }
-            } else if (id === "decrease-opacity") {
-              // If the decrease-opacity action is triggered, then
-              // decrease the opacity of the GroupLayer by 0.25
-              if (layer_satu.opacity > 0) {
-                layer_satu.opacity -= 0.25;
-              }
+            });
+          } else if (id === "information") {
+            // If the information action is triggered, then
+            // open the item details page of the service layer
+            window.open(layer_satu.url);
+          } else if (id === "increase-opacity") {
+            // If the increase-opacity action is triggered, then
+            // increase the opacity of the GroupLayer by 0.25
+            if (layer_satu.opacity < 1) {
+              layer_satu.opacity += 0.25;
             }
-          });
-        
+          } else if (id === "decrease-opacity") {
+            // If the decrease-opacity action is triggered, then
+            // decrease the opacity of the GroupLayer by 0.25
+            if (layer_satu.opacity > 0) {
+              layer_satu.opacity -= 0.25;
+            }
+          }
+        });
 
         const expandList = new Expand({
           view: view,
@@ -830,8 +863,7 @@
         view.ui.add([filterButton], "bottom-right");
       });
 
-      a
-
+      a;
     </script>
   </body>
 </html>
