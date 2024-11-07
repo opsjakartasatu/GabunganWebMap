@@ -443,9 +443,39 @@
                   rwDropdown.appendChild(option);
                 });
 
-                if (result.features.length > 0) {
-                  zoomToFeature(result.features[0].attributes.objectId); // Adjust this based on your actual objectId attribute
-                }
+                // Query to zoom to all features matching the Kelurahan filter
+                layer_satu
+                  .queryFeatures({
+                    where: `WADMKD = '${selectedKelurahan}'`,
+                    returnGeometry: true,
+                  })
+                  .then((zoomResult) => {
+                    if (zoomResult.features.length > 0) {
+                      // Calculate the combined extent of all features
+                      const extent = zoomResult.features.reduce(
+                        (acc, feature) => {
+                          return acc.union(feature.geometry.extent);
+                        },
+                        zoomResult.features[0].geometry.extent
+                      );
+
+                      // Zoom to the combined extent of all matching features
+                      view
+                        .goTo(extent)
+                        .then(() => {
+                          console.log(
+                            "Zoomed to all features in the selected Kelurahan"
+                          );
+                        })
+                        .catch((error) => {
+                          console.error("Zoom failed: ", error);
+                        });
+                    } else {
+                      console.log(
+                        "No features found for the selected Kelurahan."
+                      );
+                    }
+                  });
               });
           }
         }
@@ -458,6 +488,37 @@
 
           if (selectedKelurahan && selectedRw) {
             layer_satu.definitionExpression = `WADMKD = '${selectedKelurahan}' AND WADMRW = '${selectedRw}'`;
+
+            // Query to get features matching both Kelurahan and RW and zoom to their extent
+            layer_satu
+              .queryFeatures({
+                where: `WADMKD = '${selectedKelurahan}' AND WADMRW = '${selectedRw}'`,
+                returnGeometry: true,
+              })
+              .then((zoomResult) => {
+                if (zoomResult.features.length > 0) {
+                  // Calculate the combined extent of all features that match the filter
+                  const extent = zoomResult.features.reduce((acc, feature) => {
+                    return acc.union(feature.geometry.extent);
+                  }, zoomResult.features[0].geometry.extent);
+
+                  // Zoom to the combined extent of all matching features
+                  view
+                    .goTo(extent)
+                    .then(() => {
+                      console.log(
+                        "Zoomed to features matching both Kelurahan and RW filter"
+                      );
+                    })
+                    .catch((error) => {
+                      console.error("Zoom failed: ", error);
+                    });
+                } else {
+                  console.log(
+                    "No features found for the selected Kelurahan and RW."
+                  );
+                }
+              });
           }
         }
 
@@ -488,11 +549,44 @@
             // Update definition expression to filter by search text
             layer_satu.definitionExpression = `LOWER(WADMKD) LIKE LOWER('%${searchText}%')`; // Karena databasenya case-sensitif
 
-            // Optionally, you may want to refresh the feature table or layer after filtering
+            // Refresh the layer to apply the filter
             layer_satu.refresh();
+
+            // Query features matching the search text to zoom to their extent
+            layer_satu
+              .queryFeatures({
+                where: `LOWER(WADMKD) LIKE LOWER('%${searchText}%')`,
+                returnGeometry: true,
+              })
+              .then((searchResult) => {
+                if (searchResult.features.length > 0) {
+                  // Calculate the combined extent of all matching features
+                  const extent = searchResult.features.reduce(
+                    (acc, feature) => {
+                      return acc.union(feature.geometry.extent);
+                    },
+                    searchResult.features[0].geometry.extent
+                  );
+
+                  // Zoom to the combined extent of all matching features
+                  view
+                    .goTo(extent)
+                    .then(() => {
+                      console.log(
+                        "Zoomed to features matching the search text."
+                      );
+                    })
+                    .catch((error) => {
+                      console.error("Zoom failed: ", error);
+                    });
+                } else {
+                  console.log("No features found for the search text.");
+                }
+              });
           } else {
-            // If search text is empty, remove the definition expression
+            // If search text is empty, remove the definition expression and reset view
             layer_satu.definitionExpression = null;
+            layer_satu.refresh();
           }
         }
 
