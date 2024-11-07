@@ -291,6 +291,7 @@
         const featureTable = new FeatureTable({
           view: view,
           layer: layer_satu,
+          attachmentsEnabled: true,
           visibleElements: {
             // Autocast to VisibleElements
             menuItems: {
@@ -333,6 +334,11 @@
                 type: "field",
                 fieldName: "Dinas_PRKP",
                 label: "DINAS",
+              },
+              {
+                type: "attachment",
+                fieldName: "Attachment",
+                label: "Attachments",
               },
             ],
           },
